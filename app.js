@@ -78,13 +78,44 @@ app.get("/edit/:id" , isLoggedIn , async (req,res) =>{
 
 })
 
-app.post("/edit/:id" ,isLoggedIn, async(req,res)=>{
-    let id = req.params.id;
-    await postModel.findOneAndUpdate({_id: id},{content: content},{new:true}) ;
+// app.post("/edit/:id" ,isLoggedIn, async(req,res)=>{
+//     let id = req.params.id;
+//     await postModel.findOneAndUpdate({_id: id},{content: content},{new:true}) ;
     
+//     res.redirect("/profile")
+    
+// })
+
+app.post("/update/:id" ,async (req,res)=>{
+    let post = await postModel.findOneAndUpdate({_id:req.params.id} ,{content:req.body.content});
     res.redirect("/profile")
-    
+
 })
+
+app.post("/edit/:id", isLoggedIn, async (req, res) => {
+    const postId = req.params.id;
+    const { content } = req.body; // Retrieve the updated content from the request body
+
+    try {
+        // Update the content of the existing post by ID
+        const updatedPost = await postModel.findByIdAndUpdate(
+            postId,
+            { content }, // Set the new content
+            { new: true } // Return the updated document
+        );
+
+        if (!updatedPost) {
+            return res.status(404).send("Post not found");
+        }
+
+        res.redirect("/profile"); // Redirect back to the profile after successful update
+    } catch (error) {
+        console.error("Error updating post:", error);
+        res.status(500).send("Error updating post");
+    }
+});
+
+
 
 app.post("/post" ,isLoggedIn, async(req,res)=>{
     let user= await userModel.findOne({email:req.user.email});

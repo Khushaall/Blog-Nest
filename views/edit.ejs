@@ -121,7 +121,7 @@
                 </div>
                 <h1 class="text-4xl font-bold ">Hello, <%= user.name %></h1>
             </div>
-            <form method="post" action="/post" class=" mt-5">
+            <form method="post" action="/update/<%=post._id%>" class=" mt-5">
                 <textarea class="w-full h-full p-4 bg-transparent border-2 border-zinc-800 rounded-lg resize-none text-white placeholder-gray-300 text-white"
                     name="content" placeholder=""><%= post.content %></textarea>
                 <div class="flex justify-center mt-4">
