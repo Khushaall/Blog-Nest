@@ -1,6 +1,16 @@
 const mongoose =require('mongoose');
 
-mongoose.connect('mongodb://localhost/miniapp');
+// const mongoURI = process.env.MONGO_URI || 'mongodb://localhost/miniapp';
+
+// mongoose.connect(mongoURI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// })
+// .then(() => console.log('MongoDB connected successfully'))
+// .catch(err => console.error('MongoDB connection error:', err));
+
+mongoose.connect("mongodb://localhost/ink");
+
 
 const userSchema= mongoose.Schema({
     username:String,
