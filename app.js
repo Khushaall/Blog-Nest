@@ -193,7 +193,7 @@ function isLoggedIn(req, res, next) {
     }
 
     try {
-        const data = jwt.verify(token, "Secret");
+        const data = jwt.verify(token, jwtSecret);
         req.user = data;
         next();
     } catch (err) {
