@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create User</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .bg-custom {
             background-image: url('/images/back1.jpg'); 
@@ -18,25 +19,30 @@
             padding: 2rem; 
         }
     </style>
-    <script src="https://cdn.tailwindcss.com">                
-    </script>
+    <% if (alertMessage) { %>
+        <script>
+          alert("<%= alertMessage %>");
+        </script>
+      <% } %>
+    
     
 </head>
 
 <body class="bg-custom">
+  
     <div class="flex items-center justify-center min-h-screen bg-overlay">
         <div class="bg-zinc-800 p-8 rounded-lg shadow-lg w-full max-w-md">
             <h1 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-green-400 text-center pb-5">
                 Create User
             </h1>
             <form action="/register" method="post" class="flex flex-col gap-4">
-                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" type="text" name="name" placeholder="Name">
-                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" type="text" name="username" placeholder="Username">
-                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" type="email" name="email" placeholder="Email">
-                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" type="number" name="age" placeholder="Age" min="16">
-                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" type="password" name="password" placeholder="Password">
+                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" required type="text" name="name" placeholder="Name">
+                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" required type="text" name="username" placeholder="Username">
+                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" required type="email" name="email" placeholder="Email">
+                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" required type="number" name="age" placeholder="Age" min="16">
+                <input class="px-3 py-2 rounded-md outline-none bg-zinc-700 text-white" required type="password" name="password" placeholder="Password">
                 <input class="px-3 py-2 rounded-md bg-blue-500 text-white cursor-pointer hover:bg-blue-600" type="submit" value="Create User">
-                <a href="/login" class="bg-#357abd flex justify-center text-zinc-400">Already have an account? Log in</a>
+                <a href="/login" class=" flex justify-center text-zinc-400">Already have an account? Log in</a>
             </form>
         </div>
     </div>

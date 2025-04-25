@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
     <style>
         .bg-custom {
             background-image: url('/images/back1.jpg'); 
@@ -45,6 +46,12 @@
             });
         });
     </script>
+
+    <% if (alertMessage) { %>
+        <script>
+          alert("<%= alertMessage %>");
+        </script>
+      <% } %>
 </head>
 <body class="bg-custom">
     <div class="flex items-center justify-center min-h-screen">
@@ -56,7 +63,7 @@
                 <input class="px-3 py-2 rounded-md outline-none bg-gray-100 text-gray-800 placeholder-gray-600" type="email" name="email" placeholder="Email" required>
                 <input class="px-3 py-2 rounded-md outline-none bg-gray-100 text-gray-800 placeholder-gray-600" type="password" name="password" placeholder="Password" required>
                 <input class="px-3 py-2 rounded-md bg-blue-600 text-white cursor-pointer hover:bg-blue-700" type="submit" value="Log In">
-                <a href="/" class="bg-#357abd flex justify-center text-zinc-400">Create Acoount</a>
+                <a href="/" class="bg-#357abd flex justify-center text-zinc-400">Create Account</a>
             </form>
         </div>
     </div>

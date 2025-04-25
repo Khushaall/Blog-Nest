@@ -5,9 +5,12 @@ const postModel =require("./models/post");
 const bcrypt = require('bcrypt');
 const jwt= require ("jsonwebtoken"); 
 const cookieParser= require('cookie-parser');
-const multer =require("./config/multerconfig");
 const path= require('path');
 
+require('dotenv').config();
+
+const jwtSecret = process.env.JWT_SECRET;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -16,15 +19,19 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname,"public")))
 
 app.get("/" , (req,res) => {
-    res.render("index");
+    res.render("index", { alertMessage: null });
 })
+
 
 app.post("/register", async (req,res)=>{
 
     let {name, username, age,password, email} = req.body;
     
     let user= await userModel.findOne({email});
-    if(user) return res.status(500).send("User already Registered");
+    if (user) {
+        return res.render('index', { alertMessage: 'User already registered' });
+      }
+      
 
     bcrypt.genSalt(10,(err,salt)=>{
         bcrypt.hash(password, salt ,async (err,hash) => {
@@ -37,7 +44,7 @@ app.post("/register", async (req,res)=>{
         
             });
 
-            let token = jwt.sign({email: email ,userid: user._id}, "Secret");
+            let token = jwt.sign({email: email ,userid: user._id}, jwtSecret);
             res.cookie( "token" , token);
             res.redirect("/profile");
         } )
@@ -46,8 +53,30 @@ app.post("/register", async (req,res)=>{
 });
 
 app.get("/login" , (req,res) => { 
-    res.render("login");
-})
+    res.render("login", { alertMessage: null });
+});
+
+
+app.post("/login", async (req,res)=>{
+    let { password, email} = req.body;
+    
+    let user= await userModel.findOne({email});
+    if(!user) return res.render("login" , { alertMessage :  "No User" });
+
+    bcrypt.compare(password,user.password , (err,result)=>{
+        if(result) {
+            let token = jwt.sign({email: email ,userid: user._id}, jwtSecret);
+            res.cookie( "token" , token);
+            res.status(200).redirect("/profile")
+        }
+        else {
+            res.render("login" , { alertMessage :  "Wrong Credentials" });
+        }
+    })
+
+    
+
+});
 
 app.get("/profile" , isLoggedIn, async (req,res) =>{ 
     let user= await userModel.findOne({email: req.user.email}).populate("posts");
@@ -78,13 +107,6 @@ app.get("/edit/:id" , isLoggedIn , async (req,res) =>{
 
 })
 
-// app.post("/edit/:id" ,isLoggedIn, async(req,res)=>{
-//     let id = req.params.id;
-//     await postModel.findOneAndUpdate({_id: id},{content: content},{new:true}) ;
-    
-//     res.redirect("/profile")
-    
-// })
 
 app.post("/update/:id" ,async (req,res)=>{
     let post = await postModel.findOneAndUpdate({_id:req.params.id} ,{content:req.body.content});
@@ -92,23 +114,39 @@ app.post("/update/:id" ,async (req,res)=>{
 
 })
 
+app.get("/allposts", isLoggedIn, async (req, res) => {
+    try {
+        let curruser = await userModel.findOne({ email: req.user.email });
+        let allposts = await postModel.find().populate("user");
+        allposts = allposts.filter(post => post.user); // Remove posts with missing user
+
+        res.render("posts", { allposts, curruser });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("An error occurred");
+    }
+});
+
+
+
+
 app.post("/edit/:id", isLoggedIn, async (req, res) => {
     const postId = req.params.id;
-    const { content } = req.body; // Retrieve the updated content from the request body
+    const { content } = req.body; 
 
     try {
-        // Update the content of the existing post by ID
+        
         const updatedPost = await postModel.findByIdAndUpdate(
             postId,
-            { content }, // Set the new content
-            { new: true } // Return the updated document
+            { content }, 
+            { new: true } 
         );
 
         if (!updatedPost) {
             return res.status(404).send("Post not found");
         }
 
-        res.redirect("/profile"); // Redirect back to the profile after successful update
+        res.redirect("/profile"); 
     } catch (error) {
         console.error("Error updating post:", error);
         res.status(500).send("Error updating post");
@@ -144,37 +182,28 @@ await postModel.findOneAndDelete({_id:id});
 res.redirect("/profile");
 
 })
-app.post("/login", async (req,res)=>{
-    let { password, email} = req.body;
-    
-    let user= await userModel.findOne({email});
-    if(!user) return res.status(500).send("Something went wrong");
-
-    bcrypt.compare(password,user.password , (err,result)=>{
-        if(result) {
-            let token = jwt.sign({email: email ,userid: user._id}, "Secret");
-            res.cookie( "token" , token);
-            res.status(200).redirect("/profile")
-        }
-        else {
-            res.redirect("/login")
-        }
-    })
-
-    
-
-});
 
 
 
-function isLoggedIn(req,res,next){
-     if(req.cookies.token === "") res.redirect("/login");
-     else{
-        let data = jwt.verify(req.cookies.token,"Secret");
-        req.user = data
-     }
-     next(); 
+
+function isLoggedIn(req, res, next) {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.redirect("/login");
+    }
+
+    try {
+        const data = jwt.verify(token, "Secret");
+        req.user = data;
+        next();
+    } catch (err) {
+        console.error("JWT verification failed:", err);
+        res.redirect("/login");
+    }
 }
 
 
-app.listen(3000);
+
+app.listen(PORT,()=>{
+    console.log("Running in PORT");
+});
