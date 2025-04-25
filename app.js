@@ -95,7 +95,8 @@ app.get("/like/:id" , isLoggedIn , async (req,res) =>{
     }
     
     post.save();
-    res.redirect("/profile");
+      res.redirect(req.get('Referer'));
+
 
 })
 
