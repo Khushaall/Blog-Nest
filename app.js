@@ -117,11 +117,11 @@ app.post("/update/:id" ,async (req,res)=>{
 
 app.get("/allposts", isLoggedIn, async (req, res) => {
     try {
-        let curruser = await userModel.findOne({ email: req.user.email });
+        let user = await userModel.findOne({ email: req.user.email });
         let allposts = await postModel.find().populate("user");
         allposts = allposts.filter(post => post.user); // Remove posts with missing user
 
-        res.render("posts", { allposts, curruser });
+        res.render("posts", { allposts, user });
     } catch (err) {
         console.error(err);
         res.status(500).send("An error occurred");
