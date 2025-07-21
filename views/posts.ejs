@@ -128,7 +128,9 @@
                                 <h4 class="text-xl font-semibold mb-2"><%= post.user.username %></h4>
                                 <p class="text-gray-300"><%= post.content %></p>
                                 <div class="flex gap-3 mt-3 mb-2 justify-end">
-                                    <span class="text-sm text-gray-400"><%= post.likes.length %> likes</span>
+                                    <span class="text-sm text-gray-400"><%= post.likes.length %> <a href="/like/<%= post._id %>" class="button-secondary">
+                                        <%= post.likes.indexOf(user._id) === -1 ? "Like" : "Unlike" %>
+                                    </a></span>
                                 </div>
                             </div>
                         <% } %>
